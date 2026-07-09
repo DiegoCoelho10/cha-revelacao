@@ -468,6 +468,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       <div class="cta-hero">
         <button class="btn" id="ir-rsvp">Confirmar presença 🤍</button>
         <button class="btn claro" id="ir-detalhes">Detalhes da festa</button>
+        <button class="btn claro" id="ir-placar">Ver o placar ao vivo 👀</button>
       </div>
     </section>
     <footer>
@@ -644,6 +645,31 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         <span class="script">Te esperamos lá!</span>
       </footer>
     </div>
+  </main>
+
+  <!-- ===== PLACAR AO VIVO ===== -->
+  <main class="tela" id="tela-placar">
+    <div class="topo-nav"><button class="voltar" data-volta="tela-capa">← Voltar</button></div>
+    <section class="hero" style="padding-top:26px">
+      <div class="script" style="font-size:46px">Placar ao vivo</div>
+      <div class="data-linha"><span class="ela" style="color:var(--rose-escuro)">Maria Luiza</span> · <span class="ele" style="color:var(--azul-escuro)">José Vicente</span></div>
+    </section>
+    <section class="card">
+      <div class="eyebrow">A disputa até agora</div>
+      <div class="placar">
+        <div class="placar-barra" style="height:46px">
+          <div class="placar-ele" id="telao-ele" style="font-size:17px">0</div>
+          <div class="placar-ela" id="telao-ela" style="font-size:17px">0</div>
+        </div>
+        <div class="placar-legenda" style="font-size:14px">
+          <span class="ele">🧸 José Vicente</span>
+          <span class="ela">Maria Luiza 🎀</span>
+        </div>
+      </div>
+      <p class="sub" id="telao-frase"></p>
+      <p class="sub" id="telao-total" style="margin-top:4px;opacity:.75"></p>
+    </section>
+    <button class="btn" style="margin-top:22px" id="ir-rsvp-3">Deixar meu palpite 🤍</button>
   </main>
 
   <!-- ===== PAINEL ===== -->
@@ -934,6 +960,12 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   $("#ir-rsvp").addEventListener("click", abrirRsvp);
   $("#ir-rsvp-2").addEventListener("click", abrirRsvp);
   $("#ir-detalhes").addEventListener("click", function(){ vibrate(10); irTela("tela-detalhes"); });
+  $("#ir-placar").addEventListener("click", function(){
+    vibrate(10);
+    ligarPlacarPublico();
+    irTela("tela-placar");
+  });
+  $("#ir-rsvp-3").addEventListener("click", abrirRsvp);
 
   $$("[data-passo-volta]").forEach(function(b){
     b.addEventListener("click", function(){
@@ -1053,11 +1085,20 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       $("#pub-ele").style.width = (total ? Math.round(ele/total*100) : 50) + "%";
       $("#pub-ele").textContent = ele;
       $("#pub-ela").textContent = ela;
-      var frase = $("#pub-frase");
-      if (!total) frase.textContent = "Seu palpite pode abrir o placar!";
-      else if (ele === ela) frase.textContent = "Empate! A disputa está pegando fogo. 🔥";
-      else if (ele > ela) frase.textContent = "O time do José Vicente está na frente… por enquanto! 🧸";
-      else frase.textContent = "O time da Maria Luiza está na frente… por enquanto! 🎀";
+      var frase;
+      if (!total) frase = "O placar ainda está zerado. Palpite aberto!";
+      else if (ele === ela) frase = "Empate! A disputa está pegando fogo. 🔥";
+      else if (ele > ela) frase = "O time do José Vicente está na frente… por enquanto! 🧸";
+      else frase = "O time da Maria Luiza está na frente… por enquanto! 🎀";
+      $("#pub-frase").textContent = total ? frase : "Seu palpite pode abrir o placar!";
+
+      $("#telao-ele").style.width = (total ? Math.round(ele/total*100) : 50) + "%";
+      $("#telao-ele").textContent = ele;
+      $("#telao-ela").textContent = ela;
+      $("#telao-frase").textContent = frase;
+      $("#telao-total").textContent = total
+        ? total + (total === 1 ? " palpite registrado" : " palpites registrados")
+        : "";
     });
   }
 
