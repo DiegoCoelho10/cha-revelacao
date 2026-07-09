@@ -12,6 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 :root{
   --papel:#FAF6ED;
@@ -713,8 +714,28 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       <h2>Mensagens para vocês</h2>
       <div class="mural" id="mural"></div>
     </section>
+    <section class="card">
+      <div class="eyebrow">Configurações</div>
+      <h2>Zona dos papais</h2>
+      <p class="sub">Apagar remove os registros de verdade, direto do banco, e não tem como desfazer. Perfeito pra limpar os testes antes de mandar o convite pra família.</p>
+      <div class="botoes">
+        <button class="btn" id="btn-apagar-tudo">🗑️ Apagar todas as confirmações</button>
+      </div>
+    </section>
     <footer><button class="link-papais" data-volta="tela-capa">← Voltar ao convite</button></footer>
   </main>
+</div>
+
+<!-- modal de pergunta -->
+<div class="veu" id="veu-pergunta">
+  <div class="caixa">
+    <h3 id="perg-titulo"></h3>
+    <div id="perg-corpo" style="margin-top:10px;font-size:14.5px;line-height:1.65;color:var(--terra)"></div>
+    <div class="botoes">
+      <button class="btn claro" id="perg-nao"></button>
+      <button class="btn" id="perg-sim"></button>
+    </div>
+  </div>
 </div>
 
 <!-- modal senha -->
@@ -746,7 +767,8 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
     messagingSenderId: "354669765042",
     appId: "1:354669765042:web:e15ea445cc2eaccb2704ab"
   };
-  var SENHA_PAINEL = "papais2026";
+  var SENHA_PAINEL = "papais2026"; /* usada só no modo local, sem Firebase */
+  var EMAIL_PAPAIS = "papais@charevelacao.com"; /* crie este usuário no Firebase Authentication */
   var NO_RAIZ = "cha_revelacao";
   var DATA_EVENTO = new Date(2026, 7, 15, 16, 0, 0);
 
@@ -917,14 +939,48 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   }
   function ouvirConfirmacoes(cb){
     if (usandoFirebase){
-      db.ref(NO_RAIZ + "/confirmacoes").on("value", function(snap){
-        var val = snap.val() || {};
-        cb(Object.keys(val).map(function(k){ return val[k]; }));
-      }, function(){ cb([]); });
+      var tentar = function(){
+        db.ref(NO_RAIZ + "/confirmacoes").on("value", function(snap){
+          var val = snap.val() || {};
+          cb(Object.keys(val).map(function(k){
+            var r = val[k] || {};
+            r._id = k;
+            return r;
+          }));
+        }, function(){
+          cb([]);
+          setTimeout(tentar, 5000);
+        });
+      };
+      tentar();
     } else {
-      cb(lsGet("cha_revelacao_local") || []);
+      var arr = lsGet("cha_revelacao_local") || [];
+      arr.forEach(function(r, i){ r._id = "local_" + i; });
+      cb(arr);
     }
   }
+
+  /* pergunta genérica (modal) */
+  var pergSim = null, pergNao = null;
+  function perguntar(titulo, corpoHtml, labelSim, labelNao, aoSim, aoNao){
+    $("#perg-titulo").textContent = titulo;
+    $("#perg-corpo").innerHTML = corpoHtml;
+    $("#perg-sim").textContent = labelSim;
+    $("#perg-nao").textContent = labelNao;
+    pergSim = aoSim; pergNao = aoNao || null;
+    $("#veu-pergunta").classList.add("aberto");
+  }
+  (function(){
+    var v = $("#veu-pergunta");
+    $("#perg-sim").addEventListener("click", function(){
+      v.classList.remove("aberto");
+      if (pergSim) pergSim();
+    });
+    $("#perg-nao").addEventListener("click", function(){
+      v.classList.remove("aberto");
+      if (pergNao) pergNao();
+    });
+  })();
 
   /* ============================ wizard ============================ */
   var passoAtual = 1;
@@ -1046,6 +1102,34 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   var enviando = false;
   $("#btn-confirmar").addEventListener("click", function(){
     if (enviando) return;
+    vibrate(12);
+    var nome = $("#f-nome").value.trim();
+    var acomps = $$("#acomps input").map(function(i){ return i.value.trim(); }).filter(Boolean);
+    if (!acomps.length){
+      perguntar(
+        "Só você mesmo? 🤍",
+        "Você está confirmando presença apenas para <b>" + esc(nome) + "</b>, sem acompanhantes. Está certo?",
+        "Sim, só eu!",
+        "Adicionar acompanhante",
+        enviarConfirmacao,
+        function(){ irPasso(1, true); }
+      );
+    } else {
+      var lista = "<b>" + esc(nome) + "</b> (você)";
+      acomps.forEach(function(a){ lista += "<br><b>" + esc(a) + "</b>"; });
+      perguntar(
+        "Confirmando essa turma 🤍",
+        "Vamos reservar lugar para:<br><br>" + lista + "<br><br>Está certo?",
+        "Está certo!",
+        "Corrigir",
+        enviarConfirmacao,
+        function(){ irPasso(1, true); }
+      );
+    }
+  });
+
+  function enviarConfirmacao(){
+    if (enviando) return;
     var reg = {
       nome: $("#f-nome").value.trim(),
       telefone: telInput.value.trim(),
@@ -1069,7 +1153,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       }
       celebrar(reg);
     });
-  });
+  }
 
   var placarPublicoLigado = false;
   function ligarPlacarPublico(){
@@ -1153,18 +1237,30 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   veu.addEventListener("click", function(e){ if (e.target === veu) veu.classList.remove("aberto"); });
   $("#senha-entrar").addEventListener("click", tentarEntrar);
   $("#senha-input").addEventListener("keydown", function(e){ if (e.key === "Enter") tentarEntrar(); });
+  function senhaErrada(){
+    var inp = $("#senha-input");
+    inp.classList.add("erro");
+    vibrate([40,50,40]);
+    setTimeout(function(){ inp.classList.remove("erro"); }, 900);
+  }
+  function entrarNoPainel(){
+    veu.classList.remove("aberto");
+    $("#senha-input").value = "";
+    if (!usandoFirebase) $("#aviso-local").style.display = "block";
+    irTela("tela-painel");
+    ouvirConfirmacoes(renderPainel);
+  }
   function tentarEntrar(){
-    if ($("#senha-input").value === SENHA_PAINEL){
-      veu.classList.remove("aberto");
-      $("#senha-input").value = "";
-      if (!usandoFirebase) $("#aviso-local").style.display = "block";
-      irTela("tela-painel");
-      ouvirConfirmacoes(renderPainel);
+    var senha = $("#senha-input").value;
+    if (usandoFirebase && firebase.auth){
+      var botao = $("#senha-entrar");
+      botao.disabled = true;
+      firebase.auth().signInWithEmailAndPassword(EMAIL_PAPAIS, senha)
+        .then(function(){ botao.disabled = false; entrarNoPainel(); })
+        .catch(function(){ botao.disabled = false; senhaErrada(); });
     } else {
-      var inp = $("#senha-input");
-      inp.classList.add("erro");
-      vibrate([40,50,40]);
-      setTimeout(function(){ inp.classList.remove("erro"); }, 900);
+      if (senha === SENHA_PAINEL) entrarNoPainel();
+      else senhaErrada();
     }
   }
 
@@ -1200,10 +1296,26 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         var acomps = (r.acompanhantes && r.acompanhantes.length)
           ? '<div class="acomps">Acompanhantes: ' + r.acompanhantes.map(esc).join(", ") + '</div>'
           : "";
-        return '<div class="pessoa"><div class="topo"><b>' + esc(r.nome) + '</b>' + badge + '</div>'
+        return '<div class="pessoa"><div class="topo"><b>' + esc(r.nome) + '</b>'
+          + '<span style="display:flex;align-items:center;gap:8px">' + badge
+          + '<button class="apagar-um" data-id="' + esc(r._id) + '" data-nome="' + esc(r.nome) + '" aria-label="Apagar" '
+          + 'style="border:1.5px solid var(--borda);background:var(--linho);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:14px">🗑️</button></span></div>'
           + '<div class="tel">📞 <a href="tel:+55' + esc(telDigits) + '">' + esc(r.telefone||"") + '</a></div>'
           + acomps + '</div>';
       }).join("");
+      $$(".apagar-um").forEach(function(b){
+        b.addEventListener("click", function(){
+          var id = b.getAttribute("data-id");
+          var nome = b.getAttribute("data-nome");
+          perguntar(
+            "Apagar esta confirmação? 🗑️",
+            "A confirmação de <b>" + esc(nome) + "</b> (com acompanhantes, palpite e recado) será apagada de vez. Não dá pra desfazer.",
+            "Sim, apagar",
+            "Cancelar",
+            function(){ apagarUm(id); }
+          );
+        });
+      });
     }
 
     var recados = dadosAtuais.filter(function(r){ return r.mensagem; });
@@ -1217,6 +1329,43 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       }).join("");
     }
   }
+
+  function erroPermissao(){
+    alert("O Firebase recusou. Confere se o usuário dos papais foi criado no Authentication e se as regras novas foram publicadas.");
+  }
+  function apagarUm(id){
+    if (usandoFirebase){
+      db.ref(NO_RAIZ + "/confirmacoes/" + id).remove()
+        .then(function(){ vibrate(20); })
+        .catch(erroPermissao);
+    } else {
+      var arr = lsGet("cha_revelacao_local") || [];
+      var idx = parseInt(String(id).replace("local_",""), 10);
+      arr.splice(idx, 1);
+      lsSet("cha_revelacao_local", arr);
+      vibrate(20);
+      ouvirConfirmacoes(renderPainel);
+    }
+  }
+  $("#btn-apagar-tudo").addEventListener("click", function(){
+    perguntar(
+      "Apagar TODAS as confirmações? ⚠️",
+      "Placar, lista e mural vão ficar vazios pra sempre. Todos os registros e recados serão apagados de vez, sem volta. Tem certeza absoluta?",
+      "Sim, apagar tudo",
+      "Cancelar",
+      function(){
+        if (usandoFirebase){
+          db.ref(NO_RAIZ + "/confirmacoes").remove()
+            .then(function(){ vibrate([30,40,60]); })
+            .catch(erroPermissao);
+        } else {
+          try{ localStorage.removeItem("cha_revelacao_local"); }catch(e){}
+          vibrate([30,40,60]);
+          ouvirConfirmacoes(renderPainel);
+        }
+      }
+    );
+  });
 
   $("#btn-csv").addEventListener("click", function(){
     var linhas = [["Nome","Telefone","Acompanhantes","Total pessoas","Palpite","Mensagem","Data"]];
