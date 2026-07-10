@@ -6,6 +6,11 @@
 <title>Chá Revelação · Maria Luiza ou José Vicente?</title>
 <meta property="og:title" content="Chá Revelação 🤍 Maria Luiza ou José Vicente?">
 <meta property="og:description" content="Sábado, 15 de agosto, às 16h. Toque para abrir o convite!">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://diegocoelho10.github.io/cha-revelacao/">
+<meta property="og:image" content="https://diegocoelho10.github.io/cha-revelacao/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -402,6 +407,44 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
 .veu input.erro{border-color:#C25B5B;animation:shake .35s ease}
 .veu .botoes{margin-top:14px}
 
+/* modo revelação */
+body.rev-menina{--dourado:#B0685F;--dourado-claro:#E4BDB7}
+body.rev-menino{--dourado:#5E7B96;--dourado-claro:#B7C9DA}
+.anuncio{display:none;font-family:var(--script);font-size:clamp(40px,11vw,56px);line-height:1.15;margin-top:6px}
+body.rev-menina .anuncio{display:block;color:var(--rose-escuro)}
+body.rev-menino .anuncio{display:block;color:var(--azul-escuro)}
+body.revelado .so-convite{display:none!important}
+
+/* apostas encerradas */
+.palpite-grid.travado .palpite-card{opacity:.45;pointer-events:none}
+.aviso-encerrado{
+  display:none;text-align:center;margin-top:12px;padding:11px;border-radius:13px;
+  font-size:13px;font-weight:700;color:var(--terra);
+  background:#FBF3E2;border:1px solid var(--dourado-claro);
+}
+
+/* livro do bebê (impressão) */
+.livro{display:none}
+@media print{
+  body{background:#fff}
+  body > *:not(.livro){display:none!important}
+  body::before{display:none}
+  .livro{display:block;font-family:var(--sans);color:#5C4432}
+  .livro .capa-livro{
+    height:96vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;page-break-after:always;
+  }
+  .livro .capa-livro .titulo{font-family:var(--script);font-size:52pt;color:#B98A4A}
+  .livro .capa-livro .sub{font-family:var(--serif);font-style:italic;font-size:18pt;margin-top:14pt}
+  .livro .capa-livro .data{font-size:11pt;letter-spacing:3px;text-transform:uppercase;margin-top:10pt;color:#7A5C43}
+  .livro .recado-livro{
+    border:1pt solid #D9BC8C;border-radius:12pt;padding:16pt;margin:0 0 14pt;
+    page-break-inside:avoid;
+  }
+  .livro .recado-livro p{font-family:var(--serif);font-size:13.5pt;line-height:1.7}
+  .livro .recado-livro span{display:block;margin-top:8pt;font-size:9pt;letter-spacing:2px;text-transform:uppercase;color:#B98A4A;font-weight:700}
+}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
   .revela .hero > *,.revela .cubos .cubo,.revela .cta-hero,.seq > *,.passo.ativo .palpite-card{opacity:1!important}
@@ -446,6 +489,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   <div class="nomes-mini">Chá Revelação<br><span class="ela">Maria Luiza</span> ou <span class="ele">José Vicente</span>?</div>
   <button class="selo" id="abrir-convite" aria-label="Abrir convite">🤍</button>
   <div class="toque">Toque no selo para abrir</div>
+  <div style="position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:1px;color:rgba(122,92,67,.4)">v2.0</div>
 </div>
 
 <div class="wrap">
@@ -465,8 +509,9 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         <div class="cubo"><b id="cd-s">--</b><span>seg</span></div>
       </div>
       <div class="chegou" id="chegou">É hoje! 🤍</div>
+      <div class="anuncio" id="anuncio"></div>
       <div class="cta-hero">
-        <button class="btn" id="ir-rsvp">Confirmar presença 🤍</button>
+        <button class="btn so-convite" id="ir-rsvp">Confirmar presença 🤍</button>
         <button class="btn claro" id="ir-detalhes">Detalhes da festa</button>
         <button class="btn claro" id="ir-placar">Ver o placar ao vivo 👀</button>
       </div>
@@ -566,6 +611,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
           <span class="emoji">🧸</span><b>José Vicente</b><span>Team menino</span>
         </button>
       </div>
+      <div class="aviso-encerrado" id="aviso-encerrado">🤫 As apostas foram encerradas! Mas sua presença continua valendo ouro.</div>
       <button type="button" class="pular" id="pular-palpite">Prefiro não arriscar 🙈</button>
       <div class="nav-passo">
         <button class="btn claro" data-passo-volta="1">← Voltar</button>
@@ -640,6 +686,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         </div>
         <p class="sub" id="pub-frase"></p>
       </section>
+      <button class="btn" id="btn-euvou">Compartilhar que eu vou 📲</button>
       <button class="btn claro" id="sucesso-inicio">Confirmar outra pessoa</button>
       <footer>
         <span class="script">Te esperamos lá!</span>
@@ -714,16 +761,34 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       <div class="mural" id="mural"></div>
     </section>
     <section class="card">
+      <div class="eyebrow">O grande momento</div>
+      <h2>Revelação 🎉</h2>
+      <p class="sub">No instante da festa em que o segredo for revelado, toquem no botão certo: o site inteiro se transforma no anúncio oficial pra todo mundo que abrir o link.</p>
+      <div class="botoes">
+        <button class="btn" style="background:linear-gradient(135deg,#D9A7A0,#B0685F)" id="btn-rev-menina">🎀 É a Maria Luiza!</button>
+        <button class="btn" style="background:linear-gradient(135deg,#9FB6CC,#5E7B96)" id="btn-rev-menino">🧸 É o José Vicente!</button>
+      </div>
+      <div class="botoes">
+        <button class="btn claro" id="btn-rev-desfazer">↩️ Desfazer revelação</button>
+      </div>
+    </section>
+    <section class="card">
       <div class="eyebrow">Configurações</div>
       <h2>Zona dos papais</h2>
       <p class="sub">Apagar remove os registros de verdade, direto do banco, e não tem como desfazer. Perfeito pra limpar os testes antes de mandar o convite pra família.</p>
       <div class="botoes">
         <button class="btn" id="btn-apagar-tudo">🗑️ Apagar todas as confirmações</button>
       </div>
+      <div class="botoes">
+        <button class="btn claro" id="btn-telefones">📋 Copiar telefones</button>
+        <button class="btn claro" id="btn-livro">📖 Livro do Bebê</button>
+      </div>
     </section>
     <footer><button class="link-papais" data-volta="tela-capa">← Voltar ao convite</button></footer>
   </main>
 </div>
+
+<div class="livro" id="livro"></div>
 
 <!-- modal de pergunta -->
 <div class="veu" id="veu-pergunta">
@@ -784,6 +849,19 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
   function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
   var reduzMovimento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ================= convite com nome próprio ================= */
+  (function(){
+    try{
+      var para = new URLSearchParams(location.search).get("para");
+      if (para){
+        para = para.trim().slice(0, 30);
+        if (/^[\p{L}\s.'-]+$/u.test(para)){
+          document.querySelector(".abertura .mini").textContent = "Você recebeu um convite, " + para;
+        }
+      }
+    }catch(e){}
+  })();
 
   /* ============================ telas ============================ */
   var telaAtual = "tela-capa";
@@ -884,6 +962,12 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       abertura.classList.add("abrindo");
       document.body.classList.add("revela");
       $("#tela-capa").classList.add("ativa");
+      if (revelado && typeof confetti === "function" && !reduzMovimento){
+        var coresRev = revelado === "menina" ? ["#D9A7A0","#B0685F","#FFF9EE"] : ["#9FB6CC","#5E7B96","#FFF9EE"];
+        setTimeout(function(){ confetti({particleCount:160, spread:100, origin:{y:.5}, colors:coresRev}); }, 700);
+        setTimeout(function(){ confetti({particleCount:90, angle:60, spread:60, origin:{x:0,y:.7}, colors:coresRev}); }, 1200);
+        setTimeout(function(){ confetti({particleCount:90, angle:120, spread:60, origin:{x:1,y:.7}, colors:coresRev}); }, 1400);
+      }
     }, reduzMovimento ? 0 : 420);
     setTimeout(function(){ abertura.style.display = "none"; }, 1500);
   });
@@ -925,6 +1009,8 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       usandoFirebase = true;
     }catch(e){ usandoFirebase = false; }
   }
+  ouvirRevelacao();
+  travarApostasSePreciso();
   function salvarConfirmacao(reg, cb){
     if (usandoFirebase){
       db.ref(NO_RAIZ + "/confirmacoes").push(reg)
@@ -937,6 +1023,58 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       setTimeout(function(){ cb(true); }, 350);
     }
   }
+  var revelado = null; /* null | "menina" | "menino" */
+  function apostasEncerradas(){
+    return !!revelado || (new Date() >= DATA_EVENTO);
+  }
+  function ouvirRevelacao(){
+    var aplicar = function(v){
+      revelado = (v === "menina" || v === "menino") ? v : null;
+      aplicarRevelacao();
+    };
+    if (usandoFirebase){
+      db.ref(NO_RAIZ + "/config/revelado").on("value", function(snap){
+        aplicar(snap.val());
+      }, function(){ setTimeout(ouvirRevelacao, 5000); });
+    } else {
+      aplicar(lsGet("cha_revelacao_revelado"));
+    }
+  }
+  function definirRevelacao(v){
+    if (usandoFirebase){
+      db.ref(NO_RAIZ + "/config/revelado").set(v).catch(erroPermissao);
+    } else {
+      lsSet("cha_revelacao_revelado", v);
+      revelado = v;
+      aplicarRevelacao();
+    }
+    vibrate([40,50,90]);
+  }
+  function aplicarRevelacao(){
+    document.body.classList.remove("rev-menina","rev-menino","revelado");
+    var anuncio = $("#anuncio");
+    var pergunta = document.querySelector("#tela-capa .pergunta");
+    var nomes = document.querySelector("#tela-capa .nomes");
+    if (revelado){
+      document.body.classList.add("revelado", revelado === "menina" ? "rev-menina" : "rev-menino");
+      pergunta.textContent = "O grande mistério terminou…";
+      nomes.style.display = "none";
+      anuncio.textContent = revelado === "menina" ? "É a Maria Luiza! 🎀" : "É o José Vicente! 🧸";
+    } else {
+      pergunta.textContent = "Será que vem aí…";
+      nomes.style.display = "";
+      anuncio.textContent = "";
+    }
+    travarApostasSePreciso();
+    if (placarPublicoLigado) renderPlacarPublico(ultimoArrPlacar);
+  }
+  function travarApostasSePreciso(){
+    var travado = apostasEncerradas();
+    document.querySelector("#passo-2 .palpite-grid").classList.toggle("travado", travado);
+    $("#aviso-encerrado").style.display = travado ? "block" : "none";
+    $("#ir-rsvp-3").style.display = travado ? "none" : "block";
+  }
+
   function ouvirConfirmacoes(cb){
     if (usandoFirebase){
       var tentar = function(){
@@ -1068,6 +1206,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   var palpite = null;
   $$(".palpite-card").forEach(function(cardEl){
     cardEl.addEventListener("click", function(){
+      if (apostasEncerradas()) return;
       var ja = cardEl.classList.contains("sel");
       $$(".palpite-card").forEach(function(c){ c.classList.remove("sel"); });
       if (ja){ palpite = null; vibrate(10); return; }
@@ -1151,15 +1290,21 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         alert("Ops, não conseguimos salvar agora. Tenta de novo em instantes?");
         return;
       }
+      ultimoReg = reg;
       celebrar(reg);
     });
   }
 
   var placarPublicoLigado = false;
+  var ultimoArrPlacar = [];
   function ligarPlacarPublico(){
     if (placarPublicoLigado) return;
     placarPublicoLigado = true;
-    ouvirConfirmacoes(function(arr){
+    ouvirConfirmacoes(renderPlacarPublico);
+  }
+  function renderPlacarPublico(arr){
+    ultimoArrPlacar = arr;
+    (function(arr){
       var ele = 0, ela = 0;
       arr.forEach(function(r){
         if (r.palpite === "menino") ele++;
@@ -1170,7 +1315,12 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       $("#pub-ele").textContent = ele;
       $("#pub-ela").textContent = ela;
       var frase;
-      if (!total) frase = "O placar ainda está zerado. Palpite aberto!";
+      if (revelado){
+        var acertos = revelado === "menina" ? ela : ele;
+        frase = (revelado === "menina" ? "Deu Maria Luiza! 🎀" : "Deu José Vicente! 🧸")
+          + " " + acertos + (acertos === 1 ? " pessoa acertou" : " pessoas acertaram") + " o palpite!";
+      }
+      else if (!total) frase = "O placar ainda está zerado. Palpite aberto!";
       else if (ele === ela) frase = "Empate! A disputa está pegando fogo. 🔥";
       else if (ele > ela) frase = "O time do José Vicente está na frente… por enquanto! 🧸";
       else frase = "O time da Maria Luiza está na frente… por enquanto! 🎀";
@@ -1183,7 +1333,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       $("#telao-total").textContent = total
         ? total + (total === 1 ? " palpite registrado" : " palpites registrados")
         : "";
-    });
+    })(arr);
   }
 
   function primeiroNome(n){
@@ -1211,6 +1361,106 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
         confetti({particleCount:60, angle:120, spread:55, origin:{x:1,y:.7}, colors:cores});
       }, 750);
     }
+  }
+
+  /* cartão eu vou */
+  var ultimoReg = null;
+  $("#btn-euvou").addEventListener("click", function(){
+    vibrate(18);
+    var gerar = function(){
+      var cv;
+      try{ cv = cartaoEuVou(); }catch(e){ alert("Não consegui gerar a imagem neste navegador."); return; }
+      if (!cv || !cv.toBlob){ alert("Não consegui gerar a imagem neste navegador."); return; }
+      cv.toBlob(function(blob){
+        if (!blob){ alert("Não consegui gerar a imagem neste navegador."); return; }
+        var file = new File([blob], "eu-vou-cha-revelacao.png", {type:"image/png"});
+        var texto = "Confirmei presença no Chá Revelação da Maria Luiza ou do José Vicente! 🤍 15 de agosto";
+        if (navigator.canShare && navigator.canShare({files:[file]}) && navigator.share){
+          navigator.share({files:[file], title:"Eu vou!", text:texto}).catch(function(){});
+        } else {
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = file.name;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+        }
+      }, "image/png");
+    };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(gerar);
+    else gerar();
+  });
+
+  function cartaoEuVou(){
+    var W = 1080, H = 1920;
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var ctx = cv.getContext("2d");
+    if (!ctx) return null;
+
+    ctx.fillStyle = "#FAF6ED";
+    ctx.fillRect(0,0,W,H);
+    var g1 = ctx.createRadialGradient(W,0,0,W,0,760);
+    g1.addColorStop(0,"rgba(217,188,140,.4)"); g1.addColorStop(1,"rgba(217,188,140,0)");
+    ctx.fillStyle = g1; ctx.fillRect(0,0,W,H);
+    var g2 = ctx.createRadialGradient(0,H,0,0,H,760);
+    g2.addColorStop(0,"rgba(138,151,126,.3)"); g2.addColorStop(1,"rgba(138,151,126,0)");
+    ctx.fillStyle = g2; ctx.fillRect(0,0,W,H);
+
+    // confetes suaves
+    var cores = ["#B98A4A","#D9BC8C","#9FB6CC","#D9A7A0"];
+    for (var i=0;i<30;i++){
+      ctx.save();
+      ctx.globalAlpha = .18 + Math.random()*.2;
+      ctx.fillStyle = cores[i%4];
+      ctx.translate(60+Math.random()*(W-120), 80+Math.random()*(H-260));
+      ctx.rotate(Math.random()*Math.PI);
+      var cw = 9+Math.random()*10;
+      ctx.fillRect(0,0,cw,cw*1.8);
+      ctx.restore();
+    }
+
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(122,92,67,.75)";
+    ctx.font = "700 30px 'Nunito Sans', Arial, sans-serif";
+    ctx.fillText("C H Á   R E V E L A Ç Ã O", W/2, 300);
+
+    ctx.fillStyle = "#B98A4A";
+    ctx.font = "150px 'Great Vibes', cursive";
+    ctx.fillText("Eu vou!", W/2, 560);
+
+    ctx.fillStyle = "#5C4432";
+    ctx.font = "italic 600 54px 'Cormorant Garamond', serif";
+    var nomeConv = ultimoReg ? primeiroNome(ultimoReg.nome) : "";
+    if (nomeConv) ctx.fillText(nomeConv + " confirmou presença", W/2, 700);
+    else ctx.fillText("Presença confirmada", W/2, 700);
+
+    // selo do time
+    var palp = ultimoReg ? ultimoReg.palpite : null;
+    if (palp){
+      var ela = palp === "menina";
+      var pillW = 560, pillH = 110, py = 790;
+      var pg = ctx.createLinearGradient(W/2-pillW/2,0,W/2+pillW/2,0);
+      if (ela){ pg.addColorStop(0,"#D9A7A0"); pg.addColorStop(1,"#B0685F"); }
+      else { pg.addColorStop(0,"#9FB6CC"); pg.addColorStop(1,"#5E7B96"); }
+      ctx.fillStyle = pg;
+      if (ctx.roundRect){ ctx.beginPath(); ctx.roundRect(W/2-pillW/2, py, pillW, pillH, 55); ctx.fill(); }
+      else ctx.fillRect(W/2-pillW/2, py, pillW, pillH);
+      ctx.fillStyle = "#FFF9EE";
+      ctx.font = "800 44px 'Nunito Sans', Arial, sans-serif";
+      ctx.fillText(ela ? "Team Maria Luiza 🎀" : "Team José Vicente 🧸", W/2, py+72);
+    }
+
+    ctx.fillStyle = "#7A5C43";
+    ctx.font = "italic 600 60px 'Cormorant Garamond', serif";
+    ctx.fillText("Maria Luiza ou José Vicente?", W/2, 1560);
+    ctx.fillStyle = "rgba(122,92,67,.85)";
+    ctx.font = "700 34px 'Nunito Sans', Arial, sans-serif";
+    ctx.fillText("Sábado · 15 de agosto · 16h", W/2, 1630);
+    ctx.fillStyle = "#B98A4A";
+    ctx.font = "60px 'Great Vibes', cursive";
+    ctx.fillText("Vem descobrir com a gente", W/2, 1750);
+
+    return cv;
   }
 
   $("#sucesso-inicio").addEventListener("click", function(){
@@ -1343,6 +1593,62 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
       ouvirConfirmacoes(renderPainel);
     }
   }
+  $("#btn-rev-menina").addEventListener("click", function(){
+    perguntar("É a Maria Luiza? 🎀",
+      "O site inteiro vai virar o anúncio oficial dela, em tons de rosé, pra todo mundo que abrir o link. Confirma?",
+      "Sim, é ela!", "Cancelar",
+      function(){ definirRevelacao("menina"); });
+  });
+  $("#btn-rev-menino").addEventListener("click", function(){
+    perguntar("É o José Vicente? 🧸",
+      "O site inteiro vai virar o anúncio oficial dele, em tons de azul, pra todo mundo que abrir o link. Confirma?",
+      "Sim, é ele!", "Cancelar",
+      function(){ definirRevelacao("menino"); });
+  });
+  $("#btn-rev-desfazer").addEventListener("click", function(){
+    perguntar("Desfazer a revelação? ↩️",
+      "O site volta ao modo mistério, com a pergunta e as apostas de antes.",
+      "Sim, desfazer", "Cancelar",
+      function(){ definirRevelacao(null); });
+  });
+
+  /* copiar telefones dos confirmados */
+  $("#btn-telefones").addEventListener("click", function(){
+    if (!dadosAtuais.length){ alert("Ainda não tem confirmações pra copiar."); return; }
+    var texto = dadosAtuais.map(function(r){
+      return (r.nome || "") + ": " + (r.telefone || "");
+    }).join("\n");
+    var feito = function(){ vibrate(20); alert("Lista copiada! Cola no WhatsApp pra mandar o lembrete de véspera."); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(texto).then(feito).catch(function(){ copiaAntiga(texto); feito(); });
+    } else { copiaAntiga(texto); feito(); }
+  });
+  function copiaAntiga(texto){
+    var ta = document.createElement("textarea");
+    ta.value = texto;
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    ta.remove();
+  }
+
+  /* livro do bebê */
+  $("#btn-livro").addEventListener("click", function(){
+    var recados = dadosAtuais.filter(function(r){ return r.mensagem; });
+    if (!recados.length){ alert("Ainda não tem recados pra montar o livro."); return; }
+    var livro = $("#livro");
+    var capa = '<div class="capa-livro">'
+      + '<div class="titulo">Livro do Bebê</div>'
+      + '<div class="sub">Mensagens de carinho recebidas no Chá Revelação<br>Maria Luiza ou José Vicente?</div>'
+      + '<div class="data">15 de agosto de 2026 · Espaço Topp</div>'
+      + '</div>';
+    livro.innerHTML = capa + recados.map(function(r){
+      return '<div class="recado-livro"><p>' + esc(r.mensagem) + '</p><span>Com amor, ' + esc(r.nome) + '</span></div>';
+    }).join("");
+    vibrate(15);
+    window.print();
+  });
+
   $("#btn-apagar-tudo").addEventListener("click", function(){
     perguntar(
       "Apagar TODAS as confirmações? ⚠️",
