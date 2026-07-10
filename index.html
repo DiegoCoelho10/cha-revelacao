@@ -12,7 +12,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
 :root{
   --papel:#FAF6ED;
@@ -742,6 +741,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
 <div class="veu" id="veu-senha">
   <div class="caixa">
     <h3>Área dos papais 🔒</h3>
+    <input type="text" id="login-input" placeholder="Login" autocomplete="off" style="margin-top:14px">
     <input type="password" id="senha-input" placeholder="Senha" autocomplete="off">
     <div class="botoes">
       <button class="btn claro" id="senha-cancelar">Cancelar</button>
@@ -767,8 +767,8 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
     messagingSenderId: "354669765042",
     appId: "1:354669765042:web:e15ea445cc2eaccb2704ab"
   };
-  var SENHA_PAINEL = "papais2026"; /* usada só no modo local, sem Firebase */
-  var EMAIL_PAPAIS = "papais@charevelacao.com"; /* crie este usuário no Firebase Authentication */
+  var LOGIN_PAINEL = "papais2027";
+  var SENHA_PAINEL = "papais2027";
   var NO_RAIZ = "cha_revelacao";
   var DATA_EVENTO = new Date(2026, 7, 15, 16, 0, 0);
 
@@ -1233,6 +1233,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   $("#senha-cancelar").addEventListener("click", function(){
     veu.classList.remove("aberto");
     $("#senha-input").value = "";
+    $("#login-input").value = "";
   });
   veu.addEventListener("click", function(e){ if (e.target === veu) veu.classList.remove("aberto"); });
   $("#senha-entrar").addEventListener("click", tentarEntrar);
@@ -1251,16 +1252,11 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
     ouvirConfirmacoes(renderPainel);
   }
   function tentarEntrar(){
-    var senha = $("#senha-input").value;
-    if (usandoFirebase && firebase.auth){
-      var botao = $("#senha-entrar");
-      botao.disabled = true;
-      firebase.auth().signInWithEmailAndPassword(EMAIL_PAPAIS, senha)
-        .then(function(){ botao.disabled = false; entrarNoPainel(); })
-        .catch(function(){ botao.disabled = false; senhaErrada(); });
+    if ($("#login-input").value.trim() === LOGIN_PAINEL && $("#senha-input").value === SENHA_PAINEL){
+      $("#login-input").value = "";
+      entrarNoPainel();
     } else {
-      if (senha === SENHA_PAINEL) entrarNoPainel();
-      else senhaErrada();
+      senhaErrada();
     }
   }
 
@@ -1331,7 +1327,7 @@ footer .script{font-family:var(--script);font-size:24px;color:var(--dourado)}
   }
 
   function erroPermissao(){
-    alert("O Firebase recusou. Confere se o usuário dos papais foi criado no Authentication e se as regras novas foram publicadas.");
+    alert("O Firebase recusou. Confere se as regras novas (com escrita liberada no cha_revelacao) foram publicadas.");
   }
   function apagarUm(id){
     if (usandoFirebase){
